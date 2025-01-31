@@ -10,6 +10,7 @@ public class WebConfig
 {
     public void Configure(WebApplication app)
     {
+        
         app.UseAzDevExceptionHandler();
         app.UseSwaggerDocumentation();
         app.UseHttpsRedirection();
