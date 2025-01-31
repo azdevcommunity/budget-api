@@ -59,7 +59,7 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
     // Müşterinin toplam borcunu getir
     public async Task<decimal> GetTotalDebt(int customerId)
     {
-        return await context.Customers
+        return await context.Customers.AsNoTracking()
             .Where(c => c.Id == customerId)
             .Select(c => c.TotalDebt)
             .FirstOrDefaultAsync();
@@ -67,7 +67,7 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
 
     public async Task<IEnumerable<DebtEvent>> GetDebtEvents(int customerId)
     {
-        return await context.DebtEvents
+        return await context.DebtEvents.AsNoTracking()
             .Where(d => d.CustomerId == customerId)
             .Include(d => d.EventType)
             .Include(d => d.Customer)

@@ -12,6 +12,7 @@ public class ReportService(BudgetDbContext context)
     public async Task<object> GetCashFlow(DateTime startDate, DateTime endDate)
     {
         var result = context.DebtEvents
+            .AsNoTracking()
             .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate)
             .GroupBy(d => d.EventType)
             .Select(g => new

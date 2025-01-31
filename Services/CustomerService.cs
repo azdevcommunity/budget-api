@@ -60,7 +60,7 @@ public class CustomerService(BudgetDbContext context, IMapper mapper)
 
     public async Task<object> GetAllAsync()
     {
-        return await context.Customers
+        return await context.Customers.AsNoTracking()
             .Select(c => new
             {
                 c.Id,
