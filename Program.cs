@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddAutoConfigurationAndServices(assemblies);
 
 var app = builder.Build();
+
 app.AddAutoConfiguration(assemblies);
 
 app.Run();

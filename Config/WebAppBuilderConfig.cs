@@ -7,7 +7,6 @@ using AzDev.Core.DependencyInjection.Attributes;
 using AzDev.Core.HealthCheck.Extensions;
 using AzDev.Core.Logging.Extensions;
 using AzDev.Core.Mapper.AutoMapper;
-using AzDev.Core.Security.Extensions;
 using AzDev.Core.Validation.FluentValidation.Extensions;
 using AzDev.Core.Validation.FluentValidation.Filters;
 using AzDev.Core.Versioning.Extensions;
