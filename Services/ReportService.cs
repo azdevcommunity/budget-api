@@ -32,6 +32,7 @@ public class ReportService(BudgetDbContext context)
                 d.Customer.Description,
                 d.Customer.TotalDebt,
                 CustomerId = d.Customer.Id,
+                TransactionId = d.Id
             })
             .ToListAsync();
 
