@@ -34,33 +34,14 @@ public class ReportService(BudgetDbContext context)
                 CustomerId = d.Customer.Id,
                 TransactionId = d.Id
             })
+            .DistinctBy(c=>c.CustomerId)
             .ToListAsync();
-
-        // Müşterileri gruplandır
-        var groupedCustomers = transactions
-            .GroupBy(x => x.CustomerId)
-            .Select(g => new
-            {
-                CustomerId = g.Key,
-                Name = g.First().Name,
-                Address = g.First().Address,
-                Description = g.First().Description,
-                TotalDebt = g.First().TotalDebt,
-                Transactions = g.Select(t => new
-                {
-                    t.TransactionId,
-                    t.EventType,
-                    t.Amount,
-                    t.PaymentDate
-                }).ToList()
-            })
-            .ToList();
 
         return new
         {
             TotalPaid = transactions.Where(x => x.EventType == DebtEventType.Paid).Sum(x => x.Amount),
             TotalDebt = transactions.Where(x => x.EventType == DebtEventType.AddDebt).Sum(x => x.Amount),
-            Customers = groupedCustomers // Tekil müşteri listesi, içinde transactions ile birlikte
+            Transactions = transactions
         };
     }
 }
