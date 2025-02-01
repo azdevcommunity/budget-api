@@ -14,18 +14,18 @@ public class ReportService(BudgetDbContext context)
         var transactions = await context.DebtEvents
             .AsNoTracking()
             .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate)
-            .GroupBy(d => d.EventType)
-            .Select(g => new
+            .Select(d => new
             {
-                EventType = g.Key,
-                TotalAmount = g.Sum(d => d.Amount)
+                d.EventType,
+                d.Amount,
+                d.CreatedAt
             })
             .ToListAsync();
 
         return new
         {
-            TotalPaid = transactions.Where(x => x.EventType == DebtEventType.Paid).Sum(x => x.TotalAmount),
-            TotalDebt = transactions.Where(x => x.EventType == DebtEventType.AddDebt).Sum(x => x.TotalAmount),
+            TotalPaid = transactions.Where(x => x.EventType == DebtEventType.Paid).Sum(x => x.Amount),
+            TotalDebt = transactions.Where(x => x.EventType == DebtEventType.AddDebt).Sum(x => x.Amount),
             Transactions = transactions
         };
     }
