@@ -9,12 +9,18 @@ namespace BudgetApi.Services;
 [Component]
 public class ReportService(BudgetDbContext context)
 {
-    public async Task<object> GetCashFlow(DateTime startDate, DateTime endDate)
+    public async Task<object> GetCashFlow(DateTime startDate, DateTime endDate, int customerId)
     {
-        var transactions = await context.DebtEvents
+        var queryable = context.DebtEvents
             .AsNoTracking()
-            .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate)
-            .Select(d => new
+            .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate);
+
+        if (customerId != 0)
+        {
+            queryable = queryable.Where(x => x.CustomerId == customerId);
+        }
+
+        var transactions = await queryable.Select(d => new
             {
                 d.EventType,
                 d.Amount,
