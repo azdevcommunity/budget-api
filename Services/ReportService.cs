@@ -11,7 +11,7 @@ public class ReportService(BudgetDbContext context)
 {
     public async Task<object> GetCashFlow(DateTime startDate, DateTime endDate)
     {
-        var result = context.DebtEvents
+        var transactions = await context.DebtEvents
             .AsNoTracking()
             .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate)
             .GroupBy(d => d.EventType)
@@ -19,15 +19,14 @@ public class ReportService(BudgetDbContext context)
             {
                 EventType = g.Key,
                 TotalAmount = g.Sum(d => d.Amount)
-            });
+            })
+            .ToListAsync();
 
         return new
         {
-            TotalPaid = await result.Where(x => x.EventType == DebtEventType.Paid)
-                .SumAsync(x => x.TotalAmount),
-            TotalDebt = await result.Where(x => x.EventType == DebtEventType.AddDebt)
-                .SumAsync(x => x.TotalAmount),
-            Transactions = await result.ToListAsync()
+            TotalPaid = transactions.Where(x => x.EventType == DebtEventType.Paid).Sum(x => x.TotalAmount),
+            TotalDebt = transactions.Where(x => x.EventType == DebtEventType.AddDebt).Sum(x => x.TotalAmount),
+            Transactions = transactions
         };
     }
 }

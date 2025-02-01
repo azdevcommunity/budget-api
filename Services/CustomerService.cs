@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using AzDev.Core.DependencyInjection.Attributes;
 using BudgetApi.Context;
 using BudgetApi.Dto.Customer;
@@ -25,30 +26,17 @@ public class CustomerService(BudgetDbContext context, IMapper mapper)
         return customer;
     }
 
-    public async Task<object> GetByIdAsync(int id)
+    public async Task<CustomerResponse> GetByIdAsync(int id)
     {
         var customer = await context.Customers
+            .AsNoTracking()
+            .Include(c => c.DebtEvents)
             .Where(c => c.Id == id)
-            .Select(c => new
-            {
-                c.Id,
-                c.Name,
-                c.Description,
-                c.TotalDebt,
-                DebtEvents = c.DebtEvents.Select(d => new
-                {
-                    d.Id,
-                    d.Amount,
-                    d.TotalDebt,
-                    d.EventType,
-                    d.CreatedAt
-                }).ToList()
-            })
+            .ProjectTo<CustomerResponse>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
 
         return customer ?? throw new Exception($"Customer with id {id} not found");
     }
-
 
     public async Task<Customer> FindByIdAsync(int id)
     {
@@ -60,22 +48,11 @@ public class CustomerService(BudgetDbContext context, IMapper mapper)
 
     public async Task<object> GetAllAsync()
     {
-        return await context.Customers.AsNoTracking()
-            .Select(c => new
-            {
-                c.Id,
-                c.Name,
-                c.Description,
-                c.TotalDebt,
-                DebtEvents = c.DebtEvents.Select(d => new
-                {
-                    d.Id,
-                    d.Amount,
-                    d.TotalDebt,
-                    d.EventType,
-                    d.CreatedAt
-                }).ToList()
-            }).ToListAsync();
+        return await context.Customers
+            .AsNoTracking()
+            .Include(c => c.DebtEvents)
+            .ProjectTo<CustomerResponse>(mapper.ConfigurationProvider)
+            .ToListAsync();
     }
 
     public async Task<bool> UpdateAsync(CustomerUpdateRequest request, int id)

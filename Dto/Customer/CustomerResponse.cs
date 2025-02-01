@@ -1,6 +1,8 @@
-namespace BudgetApi.Entities;
+using BudgetApi.Entities;
 
-public class Customer
+namespace BudgetApi.Dto.Customer;
+
+public class CustomerResponse
 {
     public int Id { get; set; }
 
