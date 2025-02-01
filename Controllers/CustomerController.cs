@@ -64,4 +64,7 @@ public class CustomerController(CustomerService customerService, DebtService deb
     {
        return Ok(await debtService.GetLastPayment(id));
     }
+    
+     
+
 }

@@ -22,19 +22,14 @@ public class ReportService(BudgetDbContext context)
 
         var transactions = await queryable
             .Include(x => x.Customer)
+            .Distinct()
             .Select(d => new
             {  
                 d.EventType,
                 d.Amount,
                 PaymentDate = d.CreatedAt,
-                d.Customer.Name,
-                d.Customer.Address,
-                d.Customer.Description,
-                d.Customer.TotalDebt,
-                CustomerId = d.Customer.Id,
-                TransactionId = d.Id
             })
-            .DistinctBy(c=>c.CustomerId)
+           
             .ToListAsync();
 
         return new
@@ -42,6 +37,31 @@ public class ReportService(BudgetDbContext context)
             TotalPaid = transactions.Where(x => x.EventType == DebtEventType.Paid).Sum(x => x.Amount),
             TotalDebt = transactions.Where(x => x.EventType == DebtEventType.AddDebt).Sum(x => x.Amount),
             Transactions = transactions
+        };
+    }
+    public async Task<object> GetTotalCashFlow(DateTime startDate, DateTime endDate, int customerId)
+    {
+        var queryable = context.DebtEvents
+            .AsNoTracking()
+            .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate);
+
+        if (customerId != 0)
+        {
+            queryable = queryable.Where(x => x.CustomerId == customerId);
+        }
+
+        var totalPaid = await queryable
+            .Where(d => d.EventType == DebtEventType.Paid)
+            .SumAsync(d => d.Amount); // SQL'de SUM çalıştırılır
+
+        var totalDebt = await queryable
+            .Where(d => d.EventType == DebtEventType.AddDebt)
+            .SumAsync(d => d.Amount); // SQL'de SUM çalıştırılır
+
+        return new
+        {
+            TotalPaid = totalPaid,
+            TotalDebt = totalDebt
         };
     }
 }
