@@ -56,15 +56,25 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
         return await context.SaveChangesAsync() > 0;
     }
 
-    // Müşterinin toplam borcunu getir
-    public async Task<decimal> GetTotalDebt(int customerId)
+    public async Task<object?> GetLastPayment(int customerId)
     {
-        return await context.Customers.AsNoTracking()
+        return await context.Customers
             .Where(c => c.Id == customerId)
-            .Select(c => c.TotalDebt)
+            .Select(c => new
+            {
+                c.TotalDebt,
+                LastPayment = c.DebtEvents
+                    .Where(d => d.EventType == DebtEventType.Paid)
+                    .OrderByDescending(d => d.CreatedAt)
+                    .Select(d => new
+                    {
+                        Amount = (decimal?)d.Amount,
+                        PaymentDate = (DateTime?)d.CreatedAt
+                    })
+                    .FirstOrDefault()
+            })
             .FirstOrDefaultAsync();
     }
-
     public async Task<IEnumerable<DebtEvent>> GetDebtEvents(int customerId)
     {
         return await context.DebtEvents.AsNoTracking()

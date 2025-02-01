@@ -11,6 +11,6 @@ public class DebtResponse
     public decimal TotalDebt { get; set; }
     public DebtEventType EventType { get; set; }
     
-    [JsonProperty("debt_date")] 
+    [JsonProperty("debtDte")] 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

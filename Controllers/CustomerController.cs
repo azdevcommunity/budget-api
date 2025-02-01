@@ -58,11 +58,10 @@ public class CustomerController(CustomerService customerService, DebtService deb
     {
         return Ok(await debtService.PayDebt(id, debt));
     }
-
-    // Müşterinin toplam borcunu getir
-    [HttpGet("{id}/total-debt")]
-    public async Task<IActionResult> GetTotalDebt(int id)
+    
+    [HttpGet("{id}/last-payment")]
+    public async Task<IActionResult> GetLastPayment(int id)
     {
-       return Ok(await debtService.GetTotalDebt(id));
+       return Ok(await debtService.GetLastPayment(id));
     }
 }

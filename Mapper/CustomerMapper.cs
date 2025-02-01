@@ -12,7 +12,9 @@ public class CustomerMapper : Profile
         CreateMap<CustomerUpdateRequest, Customer>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); 
         
-        CreateMap<Customer, CustomerResponse>()
+        CreateMap<Customer, CustomerResponse>();
+            
+        CreateMap<Customer, CustomerDebtResponse>()
             .ForMember(dest => dest.DebtEvents, opt => opt.MapFrom(src => src.DebtEvents));
         
     }

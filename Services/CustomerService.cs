@@ -26,13 +26,13 @@ public class CustomerService(BudgetDbContext context, IMapper mapper)
         return customer;
     }
 
-    public async Task<CustomerResponse> GetByIdAsync(int id)
+    public async Task<CustomerDebtResponse> GetByIdAsync(int id)
     {
         var customer = await context.Customers
             .AsNoTracking()
             .Include(c => c.DebtEvents)
             .Where(c => c.Id == id)
-            .ProjectTo<CustomerResponse>(mapper.ConfigurationProvider)
+            .ProjectTo<CustomerDebtResponse>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
 
         return customer ?? throw new Exception($"Customer with id {id} not found");
@@ -50,7 +50,7 @@ public class CustomerService(BudgetDbContext context, IMapper mapper)
     {
         return await context.Customers
             .AsNoTracking()
-            .Include(c => c.DebtEvents)
+            // .Include(c => c.DebtEvents)
             .ProjectTo<CustomerResponse>(mapper.ConfigurationProvider)
             .ToListAsync();
     }
