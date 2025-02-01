@@ -25,7 +25,13 @@ public class WebAppBuilderConfig
     public void Configure(WebApplicationBuilder builder)
     {
         Assembly[] assemblies = [typeof(Program).Assembly];
-
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAllOrigins",
+                builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+        });
         builder
             // .AddAuthorization()
             // .AddJwtTokenAuthentication()

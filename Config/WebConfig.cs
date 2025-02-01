@@ -13,6 +13,7 @@ public class WebConfig
         app.UseAzDevExceptionHandler();
         app.UseSwaggerDocumentation();
         app.UseHttpsRedirection();
+        app.UseCors("AllowAllOrigins");
         // app.UseAuthorization();
         // app.UseAuthentication();
         app.MapControllers();
