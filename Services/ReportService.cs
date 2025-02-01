@@ -20,11 +20,17 @@ public class ReportService(BudgetDbContext context)
             queryable = queryable.Where(x => x.CustomerId == customerId);
         }
 
-        var transactions = await queryable.Select(d => new
+        var transactions = await queryable
+            .Include(x => x.Customer)
+            .Select(d => new
             {
                 d.EventType,
                 d.Amount,
-                d.CreatedAt
+                PaymentDate = d.CreatedAt,
+                d.Customer.Name,
+                d.Customer.Address,
+                d.Customer.Description,
+                d.Customer.TotalDebt,
             })
             .ToListAsync();
 
