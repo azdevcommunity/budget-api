@@ -23,7 +23,7 @@ public class ReportService(BudgetDbContext context)
         var transactions = await queryable
             .Include(x => x.Customer)
             .Select(d => new
-            {
+            {  
                 d.EventType,
                 d.Amount,
                 PaymentDate = d.CreatedAt,
