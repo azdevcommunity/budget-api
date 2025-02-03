@@ -28,7 +28,7 @@ public class ReportService(BudgetDbContext context)
             .Distinct()
             .Select(d => new
             {  
-                d.EventType,
+                d.EventType, 
                 d.Amount,
                 PaymentDate = d.CreatedAt,
             })
