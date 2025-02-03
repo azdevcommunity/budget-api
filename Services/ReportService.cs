@@ -17,10 +17,13 @@ public class ReportService(BudgetDbContext context)
 
         if (customerId != 0)
         {
-            queryable = queryable.Where(x => x.CustomerId == customerId);
+            queryable = queryable
+                .AsNoTracking()
+                .Where(x => x.CustomerId == customerId);
         }
 
         var transactions = await queryable
+            .AsNoTracking()
             .Include(x => x.Customer)
             .Distinct()
             .Select(d => new
@@ -47,14 +50,18 @@ public class ReportService(BudgetDbContext context)
 
         if (customerId != 0)
         {
-            queryable = queryable.Where(x => x.CustomerId == customerId);
+            queryable = queryable
+                .AsNoTracking()
+                .Where(x => x.CustomerId == customerId);
         }
 
         var totalPaid = await queryable
+            .AsNoTracking()
             .Where(d => d.EventType == DebtEventType.Paid)
             .SumAsync(d => d.Amount); // SQL'de SUM çalıştırılır
 
         var totalDebt = await queryable
+            .AsNoTracking()
             .Where(d => d.EventType == DebtEventType.AddDebt)
             .SumAsync(d => d.Amount); // SQL'de SUM çalıştırılır
 
