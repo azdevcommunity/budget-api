@@ -34,6 +34,9 @@ namespace BudgetApi.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("text");
 
+                    b.Property<decimal>("CurrentDebt")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -42,6 +45,9 @@ namespace BudgetApi.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("TotalDebt")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("TotalPayment")
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");

@@ -11,7 +11,7 @@ namespace BudgetApi.Services;
 [Component]
 public class CustomerService(BudgetDbContext context, IMapper mapper)
 {
-    public async Task<Customer> AddAsync(CustomerCreateRequest request)
+    public async Task<CustomerResponse> AddAsync(CustomerCreateRequest request)
     {
         var dublicate = await context.Customers.AnyAsync(x => x.Name == request.Name);
 
@@ -21,9 +21,23 @@ public class CustomerService(BudgetDbContext context, IMapper mapper)
         }
 
         Customer customer = mapper.Map<Customer>(request);
+
+
+        if (customer.TotalDebt > 0)
+        {
+            customer.CurrentDebt = customer.TotalDebt;
+            
+            customer.DebtEvents.Add(new DebtEvent
+            {
+                Amount = customer.TotalDebt,
+                TotalDebt = customer.TotalDebt,
+                EventType = DebtEventType.AddDebt,
+                CreatedAt = DateTime.UtcNow
+            });
+        }
         await context.Customers.AddAsync(customer);
         await context.SaveChangesAsync();
-        return customer;
+        return mapper.Map<CustomerResponse>(customer);
     }
 
     public async Task<CustomerDebtResponse> GetByIdAsync(int id)

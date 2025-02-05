@@ -16,6 +16,7 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
 
 
         customer.TotalDebt += debt.Amount;
+        customer.CurrentDebt += debt.Amount;
 
         var debtEvent = new DebtEvent
         {
@@ -35,12 +36,13 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
     {
         var customer = await customerService.FindByIdAsync(customerId);
 
-        if (customer.TotalDebt < debt.Amount)
+        if (customer.CurrentDebt < debt.Amount)
         {
             throw new Exception("Amount cannotbe greater than debt");
         }
 
-        customer.TotalDebt -= debt.Amount;
+        customer.CurrentDebt -= debt.Amount;
+        customer.TotalPayment += debt.Amount;
 
         var debtEvent = new DebtEvent
         {

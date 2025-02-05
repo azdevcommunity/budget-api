@@ -9,8 +9,12 @@ public class Customer
     public string? Description { get; set; }
     
     public string? Address { get; set; }
+    
+    public decimal CurrentDebt { get; set; }
 
     public decimal TotalDebt { get; set; }
+    
+    public decimal TotalPayment { get; set; }
 
     public List<DebtEvent> DebtEvents { get; set; } = new();
 }

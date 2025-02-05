@@ -7,41 +7,34 @@ using Microsoft.EntityFrameworkCore;
 namespace BudgetApi.Services;
 
 [Component]
-public class ReportService(BudgetDbContext context)
+public class ReportService(BudgetDbContext context, CustomerService customerService)
 {
-    public async Task<object> GetCashFlow(DateTime startDate, DateTime endDate, int customerId)
+    public async Task<dynamic> GetCashFlow(DateTime startDate, DateTime endDate, int customerId)
     {
-        var queryable = context.DebtEvents
-            .AsNoTracking()
-            .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate);
+        Customer customer = await customerService.FindByIdAsync(customerId);
 
-        if (customerId != 0)
-        {
-            queryable = queryable
-                .AsNoTracking()
-                .Where(x => x.CustomerId == customerId);
-        }
-
-        var transactions = await queryable
+        var transactions = await context.DebtEvents
             .AsNoTracking()
-            .Include(x => x.Customer)
+            .Where(x => x.CustomerId == customerId)
+            .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate)
             .Distinct()
             .Select(d => new
-            {  
-                d.EventType, 
+            {
+                d.EventType,
                 d.Amount,
                 PaymentDate = d.CreatedAt,
             })
-           
             .ToListAsync();
 
-        return new
+        return  new
         {
-            TotalPaid = transactions.Where(x => x.EventType == DebtEventType.Paid).Sum(x => x.Amount),
-            TotalDebt = transactions.Where(x => x.EventType == DebtEventType.AddDebt).Sum(x => x.Amount),
+            TotalPaid = customer.TotalPayment,
+            customer.CurrentDebt,
+            customer.TotalDebt,
             Transactions = transactions
         };
     }
+
     public async Task<object> GetTotalCashFlow(DateTime startDate, DateTime endDate, int customerId)
     {
         var queryable = context.DebtEvents
