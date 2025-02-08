@@ -20,6 +20,7 @@ public class ReportService(BudgetDbContext context, CustomerService customerServ
             .Distinct()
             .Select(d => new
             {
+                d.Id,
                 d.EventType,
                 d.Amount,
                 PaymentDate = d.CreatedAt,
@@ -39,7 +40,8 @@ public class ReportService(BudgetDbContext context, CustomerService customerServ
     {
         var queryable = context.DebtEvents
             .AsNoTracking()
-            .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate);
+            .Include(x=>x.Customer)
+            .Where(d => d.CreatedAt >= startDate && d.CreatedAt < endDate && d.Customer.IsActive);
 
         if (customerId != 0)
         {

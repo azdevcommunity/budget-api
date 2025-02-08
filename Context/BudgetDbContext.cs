@@ -23,6 +23,10 @@ public class BudgetDbContext(DbContextOptions<BudgetDbContext> options, IConfigu
             .HasQueryFilter(d => d.Reversed == false);
         
         modelBuilder.Entity<Customer>()
+            .Property(d => d.IsActive )
+            .HasDefaultValueSql("TRUE");
+        
+        modelBuilder.Entity<Customer>()
             .HasQueryFilter(d => d.IsActive == true);
     }
 }

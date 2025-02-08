@@ -94,15 +94,12 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
                                   .FirstOrDefaultAsync(d => d.Id == id)
                               ?? throw new Exception("Debt event not found");
 
-      
-
 
         Customer customer = await customerService.FindByIdAsync(debtEvent.CustomerId);
-        
+
         if (debtEvent.EventType == DebtEventType.Paid)
         {
             customer.CurrentDebt += debtEvent.Amount;
-            customer.TotalDebt += debtEvent.Amount;
             customer.TotalPayment -= debtEvent.Amount;
         }
         else
@@ -110,9 +107,32 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
             customer.CurrentDebt -= debtEvent.Amount;
             customer.TotalDebt -= debtEvent.Amount;
         }
-        
+
         debtEvent.Reversed = true;
 
         return await context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<object?> UpdateDebtEvent(int id)
+    {
+        DebtEvent debtEvent = await context.DebtEvents
+                                  .IgnoreQueryFilters()
+                                  .FirstOrDefaultAsync(d => d.Id == id)
+                              ?? throw new Exception("Debt event not found");
+
+        Customer customer = await customerService.FindByIdAsync(debtEvent.CustomerId);
+        
+        if (debtEvent.EventType == DebtEventType.Paid)
+        {
+            customer.CurrentDebt += debtEvent.Amount;
+            customer.TotalPayment -= debtEvent.Amount;
+        }
+        else
+        {
+            customer.CurrentDebt -= debtEvent.Amount;
+            customer.TotalDebt -= debtEvent.Amount;
+        }
+
+        return null;
     }
 }
