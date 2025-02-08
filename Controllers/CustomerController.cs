@@ -66,19 +66,11 @@ public class CustomerController(CustomerService customerService, DebtService deb
     }
     
     // Borç ödeme
-    [HttpPost("{id}/reverse-debt")]
-    public async Task<IActionResult> ReverseDebt(int id, [FromBody] DebtRequest debt)
+    [HttpPost("{id}/reverse-debt-event")]
+    public async Task<IActionResult> ReverseDebtEvent(int id)
     {
-        return Ok(await debtService.PayDebt(id, debt));
+        return Ok(await debtService.ReverseDebt(id));
     } 
     
-    // Borç ödeme
-    [HttpPost("{id}/reverse-Payment")]
-    public async Task<IActionResult> ReversePayment(int id, [FromBody] DebtRequest debt)
-    {
-        return Ok(await debtService.PayDebt(id, debt));
-    } 
-    
-     
 
 }

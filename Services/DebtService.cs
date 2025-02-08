@@ -77,6 +77,7 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
             })
             .FirstOrDefaultAsync();
     }
+
     public async Task<IEnumerable<DebtEvent>> GetDebtEvents(int customerId)
     {
         return await context.DebtEvents.AsNoTracking()
@@ -84,5 +85,34 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
             .Include(d => d.EventType)
             .Include(d => d.Customer)
             .ToListAsync();
+    }
+
+    public async Task<object?> ReverseDebt(int id)
+    {
+        DebtEvent debtEvent = await context.DebtEvents
+                                  .IgnoreQueryFilters()
+                                  .FirstOrDefaultAsync(d => d.Id == id)
+                              ?? throw new Exception("Debt event not found");
+
+      
+
+
+        Customer customer = await customerService.FindByIdAsync(debtEvent.CustomerId);
+        
+        if (debtEvent.EventType == DebtEventType.Paid)
+        {
+            customer.CurrentDebt += debtEvent.Amount;
+            customer.TotalDebt += debtEvent.Amount;
+            customer.TotalPayment -= debtEvent.Amount;
+        }
+        else
+        {
+            customer.CurrentDebt -= debtEvent.Amount;
+            customer.TotalDebt -= debtEvent.Amount;
+        }
+        
+        debtEvent.Reversed = true;
+
+        return await context.SaveChangesAsync() > 0;
     }
 }

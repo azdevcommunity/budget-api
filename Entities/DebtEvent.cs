@@ -6,7 +6,9 @@ public class DebtEvent
     public int CustomerId { get; set; }
     public Customer Customer { get; set; }
     public decimal Amount { get; set; }
-    public decimal TotalDebt { get; set; } 
+    public decimal TotalDebt { get; set; }
     public DebtEventType EventType { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public bool Reversed { get; set; }
 }

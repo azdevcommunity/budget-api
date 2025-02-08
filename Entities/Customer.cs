@@ -15,6 +15,8 @@ public class Customer
     public decimal TotalDebt { get; set; }
     
     public decimal TotalPayment { get; set; }
+    
+    public bool IsActive { get; set; }
 
     public List<DebtEvent> DebtEvents { get; set; } = new();
 }

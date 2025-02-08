@@ -12,11 +12,17 @@ public class BudgetDbContext(DbContextOptions<BudgetDbContext> options, IConfigu
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(configuration["Database:Scheme"]);
-        
+
         modelBuilder.Entity<DebtEvent>()
             .HasOne(d => d.Customer)
             .WithMany(c => c.DebtEvents)
             .HasForeignKey(d => d.CustomerId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<DebtEvent>()
+            .HasQueryFilter(d => d.Reversed == false);
+        
+        modelBuilder.Entity<Customer>()
+            .HasQueryFilter(d => d.IsActive == true);
     }
 }
