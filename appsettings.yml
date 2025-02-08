@@ -33,5 +33,6 @@ Database:
   USERNAME: postgres
   PASSWORD: 123456789
   PORT: 5432
-  NAME: budget
+  NAME: postgres
+  SCHEME: budget
     
