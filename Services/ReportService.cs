@@ -32,6 +32,8 @@ public class ReportService(BudgetDbContext context, CustomerService customerServ
             TotalPaid = customer.TotalPayment,
             customer.CurrentDebt,
             customer.TotalDebt,
+            customer.Name,
+            customer.Address,
             Transactions = transactions
         };
     }

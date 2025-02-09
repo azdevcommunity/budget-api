@@ -1,13 +1,15 @@
+using System.Text.Json;
 using AzDev.Core.DependencyInjection.Attributes;
 using BudgetApi.Context;
 using BudgetApi.Dto.Debt;
 using BudgetApi.Entities;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore; 
+using ILogger = Serilog.ILogger;
 
 namespace BudgetApi.Services;
 
 [Component]
-public class DebtService(BudgetDbContext context, CustomerService customerService)
+public class DebtService(BudgetDbContext context, CustomerService customerService, ILogger logger)
 {
     // Borç ekleme
     public async Task<bool> AddAsync(int customerId, DebtRequest debt)
@@ -113,26 +115,51 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
         return await context.SaveChangesAsync() > 0;
     }
 
-    public async Task<object?> UpdateDebtEvent(int id)
+    public async Task<object?> UpdateDebtEvent(int id, DebtUpdateRequest request)
     {
+        //serializ
+  
+        string v = JsonSerializer.Serialize(request);
+        logger.Information(v);
         DebtEvent debtEvent = await context.DebtEvents
                                   .IgnoreQueryFilters()
                                   .FirstOrDefaultAsync(d => d.Id == id)
                               ?? throw new Exception("Debt event not found");
 
         Customer customer = await customerService.FindByIdAsync(debtEvent.CustomerId);
-        
-        if (debtEvent.EventType == DebtEventType.Paid)
+
+        decimal previousAmount = debtEvent.Amount;
+        DebtEventType previousType = debtEvent.EventType;
+
+
+        debtEvent.Amount = request.Amount;
+        debtEvent.EventType = request.EventType;
+        debtEvent.CreatedAt = request.CreatedAt.ToUniversalTime();
+
+
+        if (previousType == DebtEventType.AddDebt)
         {
-            customer.CurrentDebt += debtEvent.Amount;
-            customer.TotalPayment -= debtEvent.Amount;
+            customer.CurrentDebt -= previousAmount;
+            customer.TotalDebt -= previousAmount;
         }
-        else
+        else if (previousType == DebtEventType.Paid)
         {
-            customer.CurrentDebt -= debtEvent.Amount;
-            customer.TotalDebt -= debtEvent.Amount;
+            customer.TotalPayment -= previousAmount;
+            customer.CurrentDebt += previousAmount;
         }
 
-        return null;
+
+        if (request.EventType == DebtEventType.AddDebt)
+        {
+            customer.CurrentDebt += request.Amount;
+            customer.TotalDebt += request.Amount;
+        }
+        else if (request.EventType == DebtEventType.Paid)
+        {
+            customer.TotalPayment += request.Amount;
+            customer.CurrentDebt -= request.Amount;
+        }
+
+        return await context.SaveChangesAsync() > 0;
     }
 }

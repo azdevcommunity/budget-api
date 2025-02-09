@@ -72,10 +72,10 @@ public class CustomerController(CustomerService customerService, DebtService deb
         return Ok(await debtService.ReverseDebt(id));
     } 
     // Borç ödeme
-    [HttpPost("update-debt/{id}")]
-    public async Task<IActionResult> UpdateDebtEvent(int id)
+    [HttpPut("update-debt/{id}")]
+    public async Task<IActionResult> UpdateDebtEvent(int id, DebtUpdateRequest request)
     {
-        return Ok(await debtService.UpdateDebtEvent(id));
+        return Ok(await debtService.UpdateDebtEvent(id, request));
     } 
     
 
