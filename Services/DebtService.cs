@@ -3,7 +3,7 @@ using AzDev.Core.DependencyInjection.Attributes;
 using BudgetApi.Context;
 using BudgetApi.Dto.Debt;
 using BudgetApi.Entities;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 using ILogger = Serilog.ILogger;
 
 namespace BudgetApi.Services;
@@ -80,12 +80,25 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<DebtEvent>> GetDebtEvents(int customerId)
+    public async Task<object> GetDebtEvents()
     {
         return await context.DebtEvents.AsNoTracking()
-            .Where(d => d.CustomerId == customerId)
-            .Include(d => d.EventType)
             .Include(d => d.Customer)
+            .Where(d => d.Customer.IsActive)
+            .Select(de=>new
+            {
+                de.Amount,
+                de.EventType,
+                de.TotalDebt,
+                de.CreatedAt,
+                de.Id,
+                Customer = new Customer
+                {
+                    Id = de.Customer.Id,
+                    Name = de.Customer.Name,
+                    CurrentDebt = de.Customer.TotalDebt
+                },
+            })
             .ToListAsync();
     }
 
@@ -118,7 +131,7 @@ public class DebtService(BudgetDbContext context, CustomerService customerServic
     public async Task<object?> UpdateDebtEvent(int id, DebtUpdateRequest request)
     {
         //serializ
-  
+
         string v = JsonSerializer.Serialize(request);
         logger.Information(v);
         DebtEvent debtEvent = await context.DebtEvents

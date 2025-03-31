@@ -91,13 +91,6 @@ public class CustomerService(BudgetDbContext context, IMapper mapper)
 
     public async Task<bool> DeleteAsync(int id)
     {
-        // var count = await context.DebtEvents.Where(x => x.CustomerId == id).CountAsync();
-
-        // if (count > 0)
-        // {
-        //     throw new Exception($"Customer with id {id} already have debt events");
-        // }
-
         Customer customer = await context.Customers.FindAsync(id)
                             ?? throw new Exception($"Customer with id {id} not found");
 

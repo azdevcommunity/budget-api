@@ -78,5 +78,12 @@ public class CustomerController(CustomerService customerService, DebtService deb
         return Ok(await debtService.UpdateDebtEvent(id, request));
     } 
     
+    // Borç ödeme
+    [HttpGet("recent-transactions")]
+    public async Task<IActionResult> RecentTransactions()
+    {
+        return Ok(await debtService.GetDebtEvents());
+    } 
+    
 
 }
